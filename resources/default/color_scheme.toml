@@ -1,0 +1,12 @@
+background = [35, 39, 42]
+
+grid = [80, 80, 80]
+
+approximation = [255, 255, 255]
+approximation_opacity = 0.2
+
+channels = [
+    [255, 53, 100],
+    [255, 255, 200],
+    [25, 255, 255],
+]

@@ -1,0 +1,9 @@
+channels = 3
+
+[x]
+divisions = 10
+milliseconds_per_division = 1500
+
+[y]
+divisions = 6
+units_per_division = 5
