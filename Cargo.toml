@@ -1,0 +1,37 @@
+[package]
+name = "rt-plot"
+version = "0.1.0"
+authors = ["cyanic-selkie <cyanic-selkie@protonmail.com>"]
+edition = "2018"
+
+[dependencies]
+# CLI
+clap = "2.33.3"
+
+# Serial
+serialport = "4.0.1"
+
+# Config parsing
+toml = "0.5.8"
+serde = "1.0.126"
+serde_derive = "1.0.126"
+
+# Graphics
+glfw = "0.41.0"
+gl = "0.14.0"
+gl_loader = "0.1.2"
+rusttype = "0.9.2"
+
+# Math
+nalgebra = "0.27.1"
+ndarray = "0.14"
+ndarray-linalg = { version = "0.13.1", features = ["openblas-static"] }
+ordered-float = "2.5.1"
+
+[[bin]]
+name = "rt-plot"
+path = "src/rt-plot/main.rs"
+
+[[bin]]
+name = "rt-relay"
+path = "src/rt-relay/main.rs"
