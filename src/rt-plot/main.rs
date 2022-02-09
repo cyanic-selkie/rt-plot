@@ -66,7 +66,7 @@ fn read_data(
             .iter()
             .enumerate()
             .map(|(i, &y)| {
-                (y as f32 + data_config.y[i].raw_offset) / data_config.y[i].raw_per_division
+                (y as f32 - data_config.y[i].raw_offset) / data_config.y[i].raw_per_division
             })
             .collect();
 
