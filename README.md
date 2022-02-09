@@ -23,11 +23,11 @@ It's a simple program that reads data from standard input and plots it in real-t
 
 You can either use already compiled binaries for Linux in [releases](https://github.com/svencurkovic/rt-plot/releases) section, or you can compile from source.
 
-To compile from source, you're going to need to install [rustup](https://rustup.rs/) and [glfw](https://www.glfw.org/).
+To compile from source, you're going to need to install [rustup](https://rustup.rs/), [CMake](https://cmake.org/), and [gfortran](https://gcc.gnu.org/fortran/) for compiling OpenBLAS.
 
 For example, on Arch Linux you can install them easily by using a package manager:
 
-    paru -S rustup glfw
+    paru -S rustup cmake gcc-fortran
     
 You're also going to need to have your GPU drivers installed.
 
