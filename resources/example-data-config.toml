@@ -1,9 +1,20 @@
-channels = 3
+[grid]
+label = "Example"
 
-[x]
-divisions = 10
-milliseconds_per_division = 1500
-
-[y]
+[grid.time]
 divisions = 6
-units_per_division = 5
+
+seconds_per_division = 1.0
+raw_per_second = 1000.0
+
+label = "1 div = 1 s"
+
+[grid.data]
+divisions = 4
+zero_shift = -1.0
+
+label = "1 div = 1 g"
+
+[[y]]
+raw_offset = 0.0
+raw_per_division = 1000.0

@@ -1,7 +1,10 @@
+use super::config;
+use gl::types::{GLchar, GLenum, GLint, GLuint};
+use nalgebra::{Matrix3, Vector2};
 use std::ffi::{CStr, CString};
 
 pub struct Program {
-    id: gl::types::GLuint,
+    id: GLuint,
 }
 
 impl Program {
@@ -18,13 +21,13 @@ impl Program {
             gl::LinkProgram(program_id);
         }
 
-        let mut success: gl::types::GLint = 1;
+        let mut success: GLint = 1;
         unsafe {
             gl::GetProgramiv(program_id, gl::LINK_STATUS, &mut success);
         }
 
         if success == 0 {
-            let mut len: gl::types::GLint = 0;
+            let mut len: GLint = 0;
             unsafe {
                 gl::GetProgramiv(program_id, gl::INFO_LOG_LENGTH, &mut len);
             }
@@ -36,7 +39,7 @@ impl Program {
                     program_id,
                     len,
                     std::ptr::null_mut(),
-                    error.as_ptr() as *mut gl::types::GLchar,
+                    error.as_ptr() as *mut GLchar,
                 );
             }
 
@@ -57,6 +60,27 @@ impl Program {
             gl::UseProgram(self.id);
         }
     }
+
+    pub fn set_uniform_matrix(&self, name: &str, matrix: &nalgebra::Matrix3<f32>) {
+        unsafe {
+            let location = gl::GetUniformLocation(self.id, CString::new(name).unwrap().into_raw());
+            gl::UniformMatrix3fv(location, 1, gl::FALSE, matrix.as_ptr());
+        }
+    }
+
+    pub fn set_uniform_vector(&self, name: &str, vector: &nalgebra::Vector2<f32>) {
+        unsafe {
+            let location = gl::GetUniformLocation(self.id, CString::new(name).unwrap().into_raw());
+            gl::Uniform2fv(location, 1, vector.as_ptr());
+        }
+    }
+
+    pub fn set_uniform_texture(&self, name: &str, texture: i32) {
+        unsafe {
+            let location = gl::GetUniformLocation(self.id, CString::new(name).unwrap().into_raw());
+            gl::Uniform1i(location, texture);
+        }
+    }
 }
 
 impl Drop for Program {
@@ -68,11 +92,11 @@ impl Drop for Program {
 }
 
 pub struct Shader {
-    id: gl::types::GLuint,
+    id: GLuint,
 }
 
 impl Shader {
-    pub fn from_source(source: &CStr, kind: gl::types::GLenum) -> Result<Shader, String> {
+    pub fn from_source(source: &CStr, kind: GLenum) -> Result<Shader, String> {
         let id = shader_from_source(source, kind)?;
         Ok(Shader { id })
     }
@@ -85,7 +109,7 @@ impl Shader {
         Shader::from_source(source, gl::FRAGMENT_SHADER)
     }
 
-    pub fn id(&self) -> gl::types::GLuint {
+    pub fn id(&self) -> GLuint {
         self.id
     }
 }
@@ -98,23 +122,20 @@ impl Drop for Shader {
     }
 }
 
-pub fn shader_from_source(
-    source: &CStr,
-    kind: gl::types::GLenum,
-) -> Result<gl::types::GLuint, String> {
+pub fn shader_from_source(source: &CStr, kind: GLenum) -> Result<GLuint, String> {
     let id = unsafe { gl::CreateShader(kind) };
     unsafe {
         gl::ShaderSource(id, 1, &source.as_ptr(), std::ptr::null());
         gl::CompileShader(id);
     }
 
-    let mut success: gl::types::GLint = 1;
+    let mut success: GLint = 1;
     unsafe {
         gl::GetShaderiv(id, gl::COMPILE_STATUS, &mut success);
     }
 
     if success == 0 {
-        let mut len: gl::types::GLint = 0;
+        let mut len: GLint = 0;
         unsafe {
             gl::GetShaderiv(id, gl::INFO_LOG_LENGTH, &mut len);
         }
@@ -122,12 +143,7 @@ pub fn shader_from_source(
         let error = create_whitespace_cstring_with_len(len as usize);
 
         unsafe {
-            gl::GetShaderInfoLog(
-                id,
-                len,
-                std::ptr::null_mut(),
-                error.as_ptr() as *mut gl::types::GLchar,
-            );
+            gl::GetShaderInfoLog(id, len, std::ptr::null_mut(), error.as_ptr() as *mut GLchar);
         }
 
         return Err(error.to_string_lossy().into_owned());
@@ -145,7 +161,7 @@ fn create_whitespace_cstring_with_len(len: usize) -> CString {
     unsafe { CString::from_vec_unchecked(buffer) }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Color {
     pub r: f32,
     pub g: f32,
@@ -153,13 +169,13 @@ pub struct Color {
     pub a: f32,
 }
 
-impl From<&[u8; 3]> for Color {
-    fn from(arr: &[u8; 3]) -> Self {
+impl From<&config::Color> for Color {
+    fn from(color: &config::Color) -> Self {
         Color {
-            r: arr[0] as f32 / 255.0,
-            g: arr[1] as f32 / 255.0,
-            b: arr[2] as f32 / 255.0,
-            a: 1.0,
+            r: color.rgb[0] as f32 / 255.0,
+            g: color.rgb[1] as f32 / 255.0,
+            b: color.rgb[2] as f32 / 255.0,
+            a: color.opacity.unwrap_or(1.0),
         }
     }
 }
@@ -171,6 +187,18 @@ pub fn initialize_shaders() -> Program {
 
     let frag_shader =
         Shader::from_frag_source(&CString::new(include_str!("shaders/basic.frag")).unwrap())
+            .unwrap();
+
+    Program::from_shaders(&[vert_shader, frag_shader]).unwrap()
+}
+
+pub fn initialize_text_shaders() -> Program {
+    let vert_shader =
+        Shader::from_vert_source(&CString::new(include_str!("shaders/text.vert")).unwrap())
+            .unwrap();
+
+    let frag_shader =
+        Shader::from_frag_source(&CString::new(include_str!("shaders/text.frag")).unwrap())
             .unwrap();
 
     Program::from_shaders(&[vert_shader, frag_shader]).unwrap()
@@ -200,18 +228,22 @@ pub fn initialize_window(
     gl::load_with(|symbol| gl_loader::get_proc_address(symbol) as *const _);
 
     unsafe {
-        gl::Viewport(50, 50, width as i32 - 100, height as i32 - 100);
-
         gl::Enable(gl::BLEND);
         gl::BlendFunci(0, gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+        gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
 
         gl::ClearColor(
             background_color.r,
             background_color.g,
             background_color.b,
-            1.0,
+            background_color.a,
         );
     }
 
     (window, glfw, events)
+}
+
+pub fn transformation_matrix(translation: [f32; 2], scale: [f32; 2]) -> Matrix3<f32> {
+    Matrix3::new_nonuniform_scaling(&Vector2::new(scale[0], scale[1]))
+        * (Matrix3::new_translation(&Vector2::new(translation[0], translation[1])))
 }

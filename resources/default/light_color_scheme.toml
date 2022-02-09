@@ -1,0 +1,22 @@
+[background]
+rgb = [245, 245, 245]
+
+[labels]
+rgb = [35, 39, 42]
+
+[grid]
+rgb = [0, 0, 0]
+opacity = 0.5
+
+[fit]
+rgb = [0, 0, 0]
+
+[[channel]] 
+rgb = [115, 46, 106]
+
+[[channel]] 
+rgb = [241, 87, 93]
+
+[[channel]] 
+rgb = [64, 154, 71]
+

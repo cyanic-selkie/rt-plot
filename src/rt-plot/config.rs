@@ -1,51 +1,71 @@
 use clap::{App, Arg};
 use serde_derive::Deserialize;
 use std::fs;
-use std::vec;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
+pub struct Color {
+    pub rgb: [u8; 3],
+    pub opacity: Option<f32>,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct ColorScheme {
-    pub background: [u8; 3],
-    pub grid: [u8; 3],
-    pub approximation: [u8; 3],
-    pub approximation_opacity: f32,
-    pub channels: vec::Vec<[u8; 3]>,
+    pub background: Color,
+    pub labels: Color,
+    pub grid: Color,
+    pub fit: Color,
+    pub channel: Vec<Color>,
 }
 
-#[derive(Deserialize)]
-pub struct X {
+#[derive(Deserialize, Debug)]
+pub struct Time {
     pub divisions: u32,
-    pub milliseconds_per_division: u32,
+    pub seconds_per_division: f32,
+    pub raw_per_second: f32,
+    pub label: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
+pub struct Data {
+    pub divisions: u32,
+    pub zero_shift: f32,
+
+    pub label: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Grid {
+    pub label: String,
+    pub time: Time,
+    pub data: Data,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct Y {
-    pub divisions: u32,
-    pub units_per_division: u32,
+    pub raw_offset: f32,
+    pub raw_per_division: f32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct DataConfig {
-    pub channels: usize,
-    pub x: X,
-    pub y: Y,
+    pub grid: Grid,
+    pub y: Vec<Y>,
 }
 
-pub struct Options {
+pub struct Settings {
     pub data_config: String,
     pub color_scheme: String,
-    pub serial_port: String,
     pub width: u32,
     pub height: u32,
+    pub padding: u32,
 }
 
-pub fn parse_cli() -> Options {
+pub fn parse_cli_options() -> Settings {
     let matches = App::new("rt-plot")
-        .version("1.0")
-        .about("Receives data from a serial port and plots it in real-time using GPU acceleration.")
+        .version("0.1.0")
+        .about("Receives data from stdin and plots it in real-time using GPU acceleration.")
         .arg(
             Arg::with_name("data-config")
-                .short("d")
                 .long("data-config")
                 .value_name("FILE")
                 .help("Sets the data config file.")
@@ -54,7 +74,6 @@ pub fn parse_cli() -> Options {
         )
         .arg(
             Arg::with_name("color-scheme")
-                .short("s")
                 .long("color-scheme")
                 .value_name("FILE")
                 .help("Sets the color scheme file.")
@@ -63,17 +82,7 @@ pub fn parse_cli() -> Options {
                 .default_value("resources/default/color_scheme.toml"),
         )
         .arg(
-            Arg::with_name("serial-port")
-                .short("p")
-                .long("serial-port")
-                .value_name("SERIAL-PORT")
-                .help("Sets the serial port to read data from.")
-                .required(true)
-                .takes_value(true),
-        )
-        .arg(
             Arg::with_name("width")
-                .short("w")
                 .long("width")
                 .value_name("WIDTH")
                 .help("Sets the width of the screen.")
@@ -83,7 +92,6 @@ pub fn parse_cli() -> Options {
         )
         .arg(
             Arg::with_name("height")
-                .short("h")
                 .long("height")
                 .value_name("HEIGHT")
                 .help("Sets the height of the screen.")
@@ -91,14 +99,23 @@ pub fn parse_cli() -> Options {
                 .takes_value(true)
                 .default_value("720"),
         )
+        .arg(
+            Arg::with_name("padding")
+                .long("padding")
+                .value_name("PADDING")
+                .help("Sets the padding around the plot.")
+                .required(false)
+                .takes_value(true)
+                .default_value("100"),
+        )
         .get_matches();
 
-    Options {
+    Settings {
         data_config: String::from(matches.value_of("data-config").unwrap()),
         color_scheme: String::from(matches.value_of("color-scheme").unwrap()),
-        serial_port: String::from(matches.value_of("serial-port").unwrap()),
         width: matches.value_of("width").unwrap().parse::<u32>().unwrap(),
         height: matches.value_of("height").unwrap().parse::<u32>().unwrap(),
+        padding: matches.value_of("padding").unwrap().parse::<u32>().unwrap(),
     }
 }
 
@@ -107,7 +124,7 @@ pub fn read_data_config(data_config_filename: &str) -> DataConfig {
     toml::from_str(&data_config).unwrap()
 }
 
-pub fn read_color_scheme(data_config_filename: &str) -> ColorScheme {
-    let color_scheme = fs::read_to_string(data_config_filename).unwrap();
+pub fn read_color_scheme(color_scheme_filename: &str) -> ColorScheme {
+    let color_scheme = fs::read_to_string(color_scheme_filename).unwrap();
     toml::from_str(&color_scheme).unwrap()
 }

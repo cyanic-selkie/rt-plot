@@ -1,12 +1,22 @@
-background = [35, 39, 42]
+[background]
+rgb = [35, 39, 42]
 
-grid = [80, 80, 80]
+[labels]
+rgb = [255, 255, 255]
 
-approximation = [255, 255, 255]
-approximation_opacity = 0.2
+[grid]
+rgb = [255, 255, 255]
+opacity = 0.5
 
-channels = [
-    [255, 53, 100],
-    [255, 255, 200],
-    [25, 255, 255],
-]
+[fit]
+rgb = [255, 255, 255]
+
+[[channel]] 
+rgb = [255, 53, 100]
+
+[[channel]] 
+rgb = [255, 255, 200]
+
+[[channel]] 
+rgb = [25, 255, 255]
+
