@@ -39,7 +39,7 @@ And finally to compile everything simply run the following command.
 
     cargo build --release
     
-After the compilation is done you can find the compiled binaries in `target/release/`. There you will find two binaries: `rt-plot` and `relay`.
+After the compilation is done you can find the compiled binaries in `target/release/`. There you will find two binaries: `rt-plot` and `rt-relay`.
     
 ## Usage
 
@@ -63,25 +63,25 @@ The input `rt-plot` reads from stdin needs to be formatted as a list of datapoin
 
 Where the first integer represents the timestamp and the rest represent values of the signal for each channel.
 
-### relay
+### rt-relay
 
-Program `relay` is simply a convenient way to read comma separated values from a serial port and output them to the stdout in the format described above. Even though it is currently not implemented, it will also support reading from a UDP connection.
+Program `rt-relay` is simply a convenient way to read comma separated values from a serial port and output them to the stdout in the format described above.
 
 To read such data from serial port `/dev/ttyUSB0`, simply run the following command.
 
-    ./relay read --serial-port /dev/ttyUSB0
+    ./rt-relay read --serial-port /dev/ttyUSB0
     
-For other available arguments, run `./relay --help`.
+For other available arguments, run `./rt-relay --help`.
 
-### Combining rt-plot and relay
+### Combining rt-plot and rt-relay
 
 Putting the two programs together, to read data from serial port `/dev/ttyUSB0` and plot it using `rt-plot`, run the following command.
 
-    ./relay read --serial-port /dev/ttyUSB0 | ./rt-plot --data-config your-data-config.toml
+    ./rt-relay read --serial-port /dev/ttyUSB0 | ./rt-plot --data-config your-data-config.toml
     
 If you also wish to write the incoming data to a file, you can pipe it through `tee`.
 
-    ./relay read --serial-port /dev/ttyUSB0 | tee data | ./rt-plot --data-config your-data-config.toml
+    ./rt-relay read --serial-port /dev/ttyUSB0 | tee data | ./rt-plot --data-config your-data-config.toml
     
 And if you then wish to replay the data, it can be done via redirection.
 

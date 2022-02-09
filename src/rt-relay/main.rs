@@ -47,39 +47,20 @@ fn read_from_serial(serial_port: &str) -> Result<(), Box<dyn std::error::Error>>
 }
 
 fn main() {
-    let matches = App::new("relay")
+    let matches = App::new("rt-relay")
         .version("0.1.0")
         .about("Receives data from a serial port or a UDP connection and outputs it to stdout.")
         .subcommand(SubCommand::with_name("list-serial").about("Show all available serial ports."))
         .subcommand(
             SubCommand::with_name("read")
-                .about("Read data from a serial port or a UDP connection.")
+                .about("Read data from a serial port.")
                 .arg(
                     Arg::with_name("serial-port")
                         .long("serial-port")
                         .value_name("SERIAL-PORT")
                         .help("Sets the serial port to read data from.")
-                        .conflicts_with_all(&["ip", "udp_port"])
-                        .required_unless_all(&["ip", "udp_port"])
-                        .takes_value(true),
-                )
-                .arg(
-                    Arg::with_name("ip")
-                        .long("ip")
-                        .value_name("IP")
-                        .help("Sets the IP to read data from. Can only be used in tandem with udp-port.")
-                        .conflicts_with("serial-port")
-                        .required_unless("serial-port")
-                        .takes_value(true),
-                )
-                .arg(
-                    Arg::with_name("udp-port")
-                        .long("udp-port")
-                        .value_name("UDP-PORT")
-                        .help("Sets the UDP port to read data from. Can only be used in tandem with ip.")
-                        .conflicts_with("serial-port")
-                        .required_unless("serial-port")
-                        .takes_value(true),
+                        .takes_value(true)
+                        .required(true),
                 ),
         )
         .get_matches();
@@ -88,19 +69,13 @@ fn main() {
         // Handles printing the ports
         print_available_ports()
     } else if let Some(ref matches) = matches.subcommand_matches("read") {
-        // Handles reading the data from the serial port
-        if let Some(serial_port) = matches.value_of("serial-port") {
-            if let Err(e) = read_from_serial(serial_port) {
-                if let Some(e) = e.downcast_ref::<serialport::Error>() {
-                    eprintln!("Error connecting to the serial port: {}", e);
-                } else if let Some(e) = e.downcast_ref::<core::num::ParseIntError>() {
-                    eprintln!("Error parsing data from the serial port: {}", e);
-                }
+        let serial_port = matches.value_of("serial-port").unwrap();
+        if let Err(e) = read_from_serial(serial_port) {
+            if let Some(e) = e.downcast_ref::<serialport::Error>() {
+                eprintln!("Error connecting to the serial port: {}", e);
+            } else if let Some(e) = e.downcast_ref::<core::num::ParseIntError>() {
+                eprintln!("Error parsing data from the serial port: {}", e);
             }
-        // Handles reading the data from the UDP connection
-        } else {
-            let _ip = matches.value_of("ip");
-            let _udp_port = matches.value_of("udp-port");
         }
     }
 }
