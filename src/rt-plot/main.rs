@@ -237,9 +237,7 @@ fn main() {
             // Align the time so that the right side of the plot is the beginning. Use the minimum
             // value from the data that we are drawing to determine the shift.
             time_started = Some(
-                current_time() as f64
-                    / data_config.grid.time.seconds_per_division as f64
-                    / data_config.grid.time.raw_per_second as f64
+                current_time() as f64 / data_config.grid.time.seconds_per_division as f64 / 1000f64
                     - min.into_inner() as f64,
             );
         }
@@ -248,9 +246,7 @@ fn main() {
         let time_passed = match frozen_translation {
             Some(time_passed) => time_passed,
             None => {
-                current_time() as f64
-                    / data_config.grid.time.seconds_per_division as f64
-                    / data_config.grid.time.raw_per_second as f64
+                current_time() as f64 / data_config.grid.time.seconds_per_division as f64 / 1000f64
                     - time_started.unwrap()
             }
         };
