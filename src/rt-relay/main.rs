@@ -10,8 +10,8 @@ fn print_available_ports() {
     }
 }
 
-fn read_from_serial(serial_port: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let serial_port = serialport::new(serial_port, 115_200)
+fn read_from_serial(serial_port: &str, baud_rate: u32) -> Result<(), Box<dyn std::error::Error>> {
+    let serial_port = serialport::new(serial_port, baud_rate)
         .timeout(Duration::from_millis(10000))
         .open()?;
 
@@ -61,6 +61,14 @@ fn main() {
                         .help("Sets the serial port to read data from.")
                         .takes_value(true)
                         .required(true),
+                )
+                .arg(
+                    Arg::with_name("baud-rate")
+                        .long("baud-rate")
+                        .value_name("BAUD-RATE")
+                        .help("Sets the baud rate of the serial port used to read data from.")
+                        .takes_value(true)
+                        .required(true),
                 ),
         )
         .get_matches();
@@ -69,8 +77,13 @@ fn main() {
         // Handles printing the ports
         print_available_ports()
     } else if let Some(ref matches) = matches.subcommand_matches("read") {
+        let baud_rate = matches
+            .value_of("baud-rate")
+            .unwrap()
+            .parse::<u32>()
+            .unwrap();
         let serial_port = matches.value_of("serial-port").unwrap();
-        if let Err(e) = read_from_serial(serial_port) {
+        if let Err(e) = read_from_serial(serial_port, baud_rate) {
             if let Some(e) = e.downcast_ref::<serialport::Error>() {
                 eprintln!("Error connecting to the serial port: {}", e);
             } else if let Some(e) = e.downcast_ref::<core::num::ParseIntError>() {
