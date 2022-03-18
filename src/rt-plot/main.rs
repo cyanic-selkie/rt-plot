@@ -198,7 +198,8 @@ fn main() {
     // Main loop.
     let mut time_started = None;
     let mut frozen_translation: Option<f64> = None;
-    let mut focused_channel = None;
+    //let mut focused_channel = None;
+    let mut focused_channel = Some(0);
     let mut approximation_type = None;
     let mut approximation_range = None;
     let mut approximation_label = None;
@@ -478,54 +479,54 @@ fn main() {
                     }
                 }
                 // Use numbers 1..9 to focus channels. 0 to unfocus.
-                glfw::WindowEvent::Key(Key::Num0, _, Action::Press, _) => {
-                    focused_channel = None;
-                }
-                glfw::WindowEvent::Key(Key::Num1, _, Action::Press, _) => {
-                    if data_config.y.len() >= 1 {
-                        focused_channel = Some(0);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num2, _, Action::Press, _) => {
-                    if data_config.y.len() >= 2 {
-                        focused_channel = Some(1);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num3, _, Action::Press, _) => {
-                    if data_config.y.len() >= 3 {
-                        focused_channel = Some(2);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num4, _, Action::Press, _) => {
-                    if data_config.y.len() >= 4 {
-                        focused_channel = Some(3);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num5, _, Action::Press, _) => {
-                    if data_config.y.len() >= 5 {
-                        focused_channel = Some(4);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num6, _, Action::Press, _) => {
-                    if data_config.y.len() >= 6 {
-                        focused_channel = Some(5);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num7, _, Action::Press, _) => {
-                    if data_config.y.len() >= 7 {
-                        focused_channel = Some(6);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num8, _, Action::Press, _) => {
-                    if data_config.y.len() >= 8 {
-                        focused_channel = Some(7);
-                    }
-                }
-                glfw::WindowEvent::Key(Key::Num9, _, Action::Press, _) => {
-                    if data_config.y.len() >= 9 {
-                        focused_channel = Some(8);
-                    }
-                }
+                //glfw::WindowEvent::Key(Key::Num0, _, Action::Press, _) => {
+                //focused_channel = None;
+                //}
+                //glfw::WindowEvent::Key(Key::Num1, _, Action::Press, _) => {
+                //if data_config.y.len() >= 1 {
+                //focused_channel = Some(0);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num2, _, Action::Press, _) => {
+                //if data_config.y.len() >= 2 {
+                //focused_channel = Some(1);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num3, _, Action::Press, _) => {
+                //if data_config.y.len() >= 3 {
+                //focused_channel = Some(2);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num4, _, Action::Press, _) => {
+                //if data_config.y.len() >= 4 {
+                //focused_channel = Some(3);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num5, _, Action::Press, _) => {
+                //if data_config.y.len() >= 5 {
+                //focused_channel = Some(4);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num6, _, Action::Press, _) => {
+                //if data_config.y.len() >= 6 {
+                //focused_channel = Some(5);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num7, _, Action::Press, _) => {
+                //if data_config.y.len() >= 7 {
+                //focused_channel = Some(6);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num8, _, Action::Press, _) => {
+                //if data_config.y.len() >= 8 {
+                //focused_channel = Some(7);
+                //}
+                //}
+                //glfw::WindowEvent::Key(Key::Num9, _, Action::Press, _) => {
+                //if data_config.y.len() >= 9 {
+                //focused_channel = Some(8);
+                //}
+                //}
                 _ => {}
             }
         }

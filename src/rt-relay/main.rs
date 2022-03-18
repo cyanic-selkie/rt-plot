@@ -31,18 +31,20 @@ fn read_from_serial(serial_port: &str, baud_rate: u32) -> Result<(), Box<dyn std
             continue;
         }
 
-        let parts = input_string
-            .trim_end()
-            .trim_end_matches(",")
-            .split(',')
-            .map(|x| x.parse::<u64>())
-            .collect::<Result<Vec<u64>, core::num::ParseIntError>>()?;
+        print!("{}", input_string);
 
-        for part in parts {
-            print!("{} ", part);
-        }
+        //let parts = input_string
+        //.trim_end()
+        //.trim_end_matches(",")
+        //.split(',')
+        //.map(|x| x.parse::<u64>())
+        //.collect::<Result<Vec<u64>, core::num::ParseIntError>>()?;
 
-        println!();
+        //for part in parts {
+        //print!("{} ", part);
+        //}
+
+        //println!();
     }
 }
 
